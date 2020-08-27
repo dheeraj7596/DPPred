@@ -95,6 +95,20 @@ struct Rule
         return ret;
     }
 
+    string printOut(vector<string> &variableNames) {
+        sort(conditions.begin(), conditions.end(), byFeatureID);
+        string ret = "";
+        for (int i = 0; i < conditions.size(); ++ i) {
+            stringstream temp;
+            temp << variableNames[conditions[i].featureID] << (conditions[i].goLeft ? " < " : " >= ") << conditions[i].separator;
+            if (ret.size() > 0) {
+                ret += " AND ";
+            }
+            ret += temp.str();
+        }
+        return ret;
+    }
+
     void sortByFeatureID() {
         sort(conditions.begin(), conditions.end(), byFeatureID);
     }

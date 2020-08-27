@@ -64,12 +64,16 @@ int main(int argc, char* argv[])
 
 	Rules selected = selectRulesGLMNET(rules, topK, trainY, argv[5]);
 
+    FILE* rulesOut = tryOpen("../output/rules.txt", "w");
 	cerr << "[Selected Top " << topK << " Rules]" << endl;
 	for (int i = 0; i < selected.size(); ++ i) {
 	    cerr << selected[i].loss << "\t" << selected[i].showup(featureNames) << endl;
+        cout << selected[i].printOut(featureNames) << endl;
+        fprintf(rulesOut, selected[i].printOut(featureNames).c_str());
+        fprintf(rulesOut, "\n");
 	}
     selected.dump(argv[4]);
-
+    fclose(rulesOut);
 	return 0;
 }
 

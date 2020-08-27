@@ -1,23 +1,20 @@
 
-                            < M A T L A B (R) >
-                  Copyright 1984-2014 The MathWorks, Inc.
-                   R2014b (8.4.0.150421) 64-bit (glnxa64)
-                             September 15, 2014
+                                                                   < M A T L A B (R) >
+                                                         Copyright 1984-2020 The MathWorks, Inc.
+                                                     R2020a Update 4 (9.8.0.1417392) 64-bit (maci64)
+                                                                      June 24, 2020
 
  
-To get started, type one of these: helpwin, helpdesk, or demo.
+To get started, type doc.
 For product information, visit www.mathworks.com.
  
 
-	This is a Classroom License for instructional use only.
-	Research and commercial use is prohibited.
+train_accuracy =
 
-{Error using <=
-Matrix dimensions must agree.
+    0.8452
 
-Error in cvglmnet (line 360)
-CVerr.lambda_1se = max(options.lambda(cvm<=semin));
 
-Error in predict (line 55)
-	fit = cvglmnet(train_x, train_y, 'gaussian', options);
-} 
+accuracy =
+
+    0.8461
+
