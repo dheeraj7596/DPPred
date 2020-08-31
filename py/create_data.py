@@ -65,7 +65,7 @@ def train(df, tokenizer):
     return clf
 
 
-def dump_excel(df, path):
+def dump_excel(df, path, tokenizer):
     word_index, index_word = build_vocab(tokenizer)
     labels = set(df.label)
     label_to_index = {}
@@ -75,7 +75,8 @@ def dump_excel(df, path):
         index_to_label[i] = label
     print(label_to_index)
 
-    X_train, X_test, y_train, y_test = train_test_split(df["text"], df["label"], test_size=0.1, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(df["text"], df["label"], test_size=0.1, random_state=42,
+                                                        stratify=df["label"])
     bow_train = BOW(X_train, tokenizer, index_word)
     bow_test = BOW(X_test, tokenizer, index_word)
     y_train_index = make_index(y_train, label_to_index)
@@ -118,11 +119,11 @@ def preprocess_df(df):
 if __name__ == "__main__":
     # base_path = "/data4/dheeraj/discpattern/"
     base_path = "/Users/dheerajmekala/Work/DPPred/data/"
-    dataset = "nyt_coarse"
+    dataset = "nyt_fine"
     data_path = base_path + dataset + "/"
     df = pickle.load(open(data_path + "df.pkl", "rb"))
     df = preprocess_df(df)
     tokenizer = fit_get_tokenizer(df.text, max_words=150000)
 
     pickle.dump(tokenizer, open(data_path + "tokenizer.pkl", "wb"))
-    dump_excel(df, data_path)
+    dump_excel(df, data_path, tokenizer)

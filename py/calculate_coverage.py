@@ -1,5 +1,5 @@
 import pickle
-from py.create_data import BOW, build_vocab
+from py.create_data import BOW, build_vocab, preprocess_df
 from statistics import mode
 import numpy as np
 
@@ -55,7 +55,7 @@ def generate_mask(rule, word_index, np_arr):
 if __name__ == "__main__":
     # out_path = "/data4/dheeraj/discpattern/"
     out_path = "/Users/dheerajmekala/Work/DPPred/output/"
-    f = open(out_path + "rules.txt", "r")
+    f = open(out_path + "rules_coarse_300_600.txt", "r")
     lines = f.readlines()
     f.close()
 
@@ -65,6 +65,7 @@ if __name__ == "__main__":
     data_path = base_path + dataset + "/"
 
     df = pickle.load(open(data_path + "df.pkl", "rb"))
+    df = preprocess_df(df)
     tokenizer = pickle.load(open(data_path + "tokenizer.pkl", "rb"))
     word_index, index_word = build_vocab(tokenizer)
 
@@ -78,7 +79,16 @@ if __name__ == "__main__":
         sampled_labels = []
         for i in inds:
             sampled_labels.append(labels[i])
-        # sampled_data = bow_train[mask, :]
+        sampled_data = bow_train[mask, :]
         rule["label"] = mode(sampled_labels)
+        rule["count"] = sampled_data.shape[0]
 
+    label_to_rulecount_dict = {}
+    for l in labels:
+        label_to_rulecount_dict[l] = 0
+
+    for rule in rules:
+        label_to_rulecount_dict[rule["label"]] += 1
+
+    print(label_to_rulecount_dict)
     pass
