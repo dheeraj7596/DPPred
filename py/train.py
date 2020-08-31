@@ -98,7 +98,7 @@ def get_conflict_pseudolabels(label_to_inds):
 
 
 if __name__ == "__main__":
-    home_path = "/home/dheeraj/DPPred"
+    home_path = "/home/dheeraj/DPPred/"
     # home_path = "/Users/dheerajmekala/Work/DPPred/"
     data_home_path = home_path + "data/"
     out_path = home_path + "output/"
