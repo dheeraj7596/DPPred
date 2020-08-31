@@ -189,7 +189,7 @@ if __name__ == "__main__":
                 high_quality_inds.append(i)
 
         print("****************** CLASSIFICATION REPORT ON ALL DATA ********************")
-        print(classification_report(y_true_all, pred_labels))
+        print(classification_report(df["label"], pred_labels))
         print("*" * 80)
 
     # generate pseudo labels from rules
