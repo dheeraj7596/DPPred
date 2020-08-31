@@ -146,7 +146,7 @@ if __name__ == "__main__":
             lines = f.readlines()
             f.close()
             rules = process_rules(lines)
-            label_to_inds = associate_rules_to_labels(rules, word_index, bow_train, labels)
+            label_to_inds = associate_rules_to_labels(rules, word_index, bow_train, list(df["label"]))
             # Get the intersection ones and remove them
             ints_inds = get_conflict_pseudolabels(label_to_inds)
             print("Size of conflicting samples: ", len(ints_inds))
@@ -156,7 +156,7 @@ if __name__ == "__main__":
             y_true = []
 
             for l in label_to_inds:
-                inds = label_to_inds[l] - ints_inds
+                inds = list(label_to_inds[l] - ints_inds)
                 X += list(df.iloc[inds]["text"])
                 y_true += list(df.iloc[inds]["label"])
                 for i in inds:

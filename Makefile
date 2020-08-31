@@ -1,5 +1,7 @@
 export CC  = gcc
-export CXX = g++-10.1
+# export CXX = g++-10.1
+export CXX = g++
+
 export CFLAGS = -std=c++11 -Wall -O3 -msse2  -fopenmp  -I..
 
 BIN = ./bin/produce_candidate_patterns ./bin/rebuild_features ./bin/select_patterns ./bin/predict ./bin/combine_global_and_local
