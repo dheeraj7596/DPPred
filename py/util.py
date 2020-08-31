@@ -1,4 +1,5 @@
 from keras.preprocessing.text import Tokenizer
+from collections import Counter
 
 
 def fit_get_tokenizer(data, max_words):
@@ -16,3 +17,8 @@ def get_distinct_labels(df):
         label_to_index[label] = i
         index_to_label[i] = label
     return labels, label_to_index, index_to_label
+
+
+def most_frequent(List):
+    occurence_count = Counter(List)
+    return occurence_count.most_common(1)[0][0]

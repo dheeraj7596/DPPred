@@ -1,13 +1,12 @@
 import pickle
 from py.create_data import BOW, build_vocab, preprocess_df, dump_excel
-from statistics import mode
 from sklearn.metrics import classification_report
 import numpy as np
 import json
 import subprocess
 from py.calculate_coverage import process_rules, generate_mask
 from py.bert_utils import train_bert, test
-from py.util import get_distinct_labels
+from py.util import get_distinct_labels, most_frequent
 import sys
 import pandas as pd
 import os
@@ -79,7 +78,7 @@ def associate_rules_to_labels(rules, word_index, bow_train, labels):
         sampled_labels = []
         for i in inds:
             sampled_labels.append(labels[i])
-        rule["label"] = mode(sampled_labels)
+        rule["label"] = most_frequent(sampled_labels)
         try:
             label_to_inds[rule["label"]].update(set(inds))
         except:
