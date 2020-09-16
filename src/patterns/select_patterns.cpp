@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < selected.size(); ++ i) {
 	    cerr << selected[i].loss << "\t" << selected[i].showup(featureNames) << endl;
         cout << selected[i].printOut(featureNames) << endl;
-        fprintf(rulesOut, selected[i].printOut(featureNames).c_str());
+        fprintf(rulesOut, (std::to_string(selected[i].loss) + " ; " + selected[i].printOut(featureNames)).c_str());
         fprintf(rulesOut, "\n");
 	}
     selected.dump(argv[4]);

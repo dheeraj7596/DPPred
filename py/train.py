@@ -71,7 +71,6 @@ def generate_pseudo_labels(df, labels, label_term_dict, tokenizer):
 
 
 def associate_rules_to_labels(rules, word_index, bow_train, labels):
-    label_to_inds = {}
     for rule in rules:
         mask = generate_mask(rule, word_index, bow_train)
         inds = list(np.where(mask)[0])
@@ -79,11 +78,8 @@ def associate_rules_to_labels(rules, word_index, bow_train, labels):
         for i in inds:
             sampled_labels.append(labels[i])
         rule["label"] = most_frequent(sampled_labels)
-        try:
-            label_to_inds[rule["label"]].update(set(inds))
-        except:
-            label_to_inds[rule["label"]] = set(inds)
-    return label_to_inds
+        rule["inds"] = set(inds)
+    return rules
 
 
 def get_conflict_pseudolabels(label_to_inds):
@@ -94,6 +90,60 @@ def get_conflict_pseudolabels(label_to_inds):
                 continue
             ints_inds.update(label_to_inds[l].intersection(label_to_inds[j]))
     return ints_inds
+
+
+def arrange_label_to_rules(rules):
+    label_to_rules = {}
+    for rule in rules:
+        try:
+            label_to_rules[rule["label"]].append(rule)
+        except:
+            label_to_rules[rule["label"]] = [rule]
+
+    for l in label_to_rules:
+        label_to_rules[l] = sorted(label_to_rules[l], key=lambda x: x["rank"])
+    return label_to_rules
+
+
+def get_pseudo_labels(df, label_to_rules):
+    X = []
+    y_true = []
+    y = []
+    flagged = []
+    label_to_inds = {}
+    for l in label_to_rules:
+        label_to_inds[l] = set([])
+
+    i = 0
+    while len(set(label_to_rules.keys()) - set(flagged)) > 0:
+        for label in label_to_rules:
+            if label in flagged:
+                continue
+            rules = label_to_rules[label]
+            if i >= len(rules):
+                flagged.append(label)
+                continue
+            rule = rules[i]
+            intersection = 0
+            inds = rule["inds"]
+            for l in label_to_inds:
+                if l == label:
+                    continue
+                if len(inds.intersection(label_to_inds[l])) > 0:
+                    intersection = 1
+                    break
+            # compute intersection of rule with all other pseudo labels
+            if intersection:
+                flagged.append(label)
+            else:
+                # generate pseudo labels using inds
+                label_to_inds[label].update(inds)
+                X += list(df.iloc[inds]["text"])
+                y_true += list(df.iloc[inds]["label"])
+                for i in inds:
+                    y.append(label)
+        i += 1
+    return X, y_true, y
 
 
 if __name__ == "__main__":
@@ -145,21 +195,26 @@ if __name__ == "__main__":
             lines = f.readlines()
             f.close()
             rules = process_rules(lines)
-            label_to_inds = associate_rules_to_labels(rules, word_index, bow_train, list(df["label"]))
-            # Get the intersection ones and remove them
-            ints_inds = get_conflict_pseudolabels(label_to_inds)
-            print("Size of conflicting samples: ", len(ints_inds))
+            rules = associate_rules_to_labels(rules, word_index, bow_train, list(df["label"]))
+            label_to_rules = arrange_label_to_rules(rules)
+            if len(label_to_rules) != len(labels):
+                raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
+            X, y, y_true = get_pseudo_labels(df, label_to_rules)
 
-            X = []
-            y = []
-            y_true = []
-
-            for l in label_to_inds:
-                inds = list(label_to_inds[l] - ints_inds)
-                X += list(df.iloc[inds]["text"])
-                y_true += list(df.iloc[inds]["label"])
-                for i in inds:
-                    y.append(l)
+            # # Get the intersection ones and remove them
+            # ints_inds = get_conflict_pseudolabels(label_to_inds)
+            # print("Size of conflicting samples: ", len(ints_inds))
+            #
+            # X = []
+            # y = []
+            # y_true = []
+            #
+            # for l in label_to_inds:
+            #     inds = list(label_to_inds[l] - ints_inds)
+            #     X += list(df.iloc[inds]["text"])
+            #     y_true += list(df.iloc[inds]["label"])
+            #     for i in inds:
+            #         y.append(l)
 
             print("****************** CLASSIFICATION REPORT FOR Rules Pseudolabels ********************")
             print(classification_report(y_true, y))

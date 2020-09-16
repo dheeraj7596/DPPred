@@ -8,9 +8,12 @@ def process_rules(lines):
     rules = []
     for line in lines:
         rule = {}
+        parts = line.strip().split(";")
+        assert len(parts) == 2
+        rule["rank"] = float(parts[0].strip())
         rule["contains"] = []
         rule["not contains"] = []
-        components = line.strip().split("AND")
+        components = parts[1].strip().split("AND")
         for comp in components:
             comp = comp.strip()
 
