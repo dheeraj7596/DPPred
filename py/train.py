@@ -9,6 +9,7 @@ from py.bert_utils import train_bert, test
 from py.util import get_distinct_labels, most_frequent
 import sys
 import pandas as pd
+import os
 
 
 def generate_pseudo_labels(df, labels, label_term_dict, tokenizer):
