@@ -89,7 +89,7 @@ def create_data_loaders(dataset):
     return train_dataloader, validation_dataloader
 
 
-def train(train_dataloader, validation_dataloader, device, num_labels):
+def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
     # Load BertForSequenceClassification, the pretrained BERT model with a single
     # linear classification layer on top.
     model = BertForSequenceClassification.from_pretrained(
@@ -99,8 +99,8 @@ def train(train_dataloader, validation_dataloader, device, num_labels):
         output_attentions=False,  # Whether the model returns attentions weights.
         output_hidden_states=False,  # Whether the model returns all hidden-states.
     )
-    if device == torch.device("cuda"):
-        model.cuda()
+    if use_gpu:
+        model.to(device)
 
     # Note: AdamW is a class from the huggingface library (as opposed to pytorch)
     # I believe the 'W' stands for 'Weight Decay fix"
@@ -366,11 +366,11 @@ def evaluate(model, prediction_dataloader, device):
     return predictions, true_labels
 
 
-def test(model, X_test, y_test, use_gpu=False):
+def test(model, X_test, y_test, use_gpu=False, gpu_id=0):
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
     input_ids, attention_masks, labels = bert_tokenize(tokenizer, X_test, y_test)
     if use_gpu:
-        device = torch.device("cuda")
+        device = torch.device('cuda:' + str(gpu_id))
     else:
         device = torch.device("cpu")
     batch_size = 32
@@ -382,7 +382,7 @@ def test(model, X_test, y_test, use_gpu=False):
     return predictions
 
 
-def train_bert(X, y, use_gpu=False):
+def train_bert(X, y, use_gpu=False, gpu_id=0):
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
     input_ids, attention_masks, labels = bert_tokenize(tokenizer, X, y)
 
@@ -394,9 +394,9 @@ def train_bert(X, y, use_gpu=False):
 
     # Tell pytorch to run this model on the GPU.
     if use_gpu:
-        device = torch.device("cuda")
+        device = torch.device('cuda:' + str(gpu_id))
     else:
         device = torch.device("cpu")
 
-    model = train(train_dataloader, validation_dataloader, device, num_labels=len(set(y)))
+    model = train(train_dataloader, validation_dataloader, use_gpu, device, num_labels=len(set(y)))
     return model

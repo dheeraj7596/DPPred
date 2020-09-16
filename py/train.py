@@ -154,6 +154,7 @@ if __name__ == "__main__":
 
     use_gpu = int(sys.argv[1])
     threshold = float(sys.argv[2])
+    gpu_id = int(sys.argv[3])
 
     base_path = "/data4/dheeraj/discpattern/"
     # base_path = "/Users/dheerajmekala/Work/DPPred/data/"
@@ -222,13 +223,13 @@ if __name__ == "__main__":
         y_vec = []
         for lbl_ in y:
             y_vec.append(label_to_index[lbl_])
-        model = train_bert(X, y_vec, use_gpu)
+        model = train_bert(X, y_vec, use_gpu, gpu_id)
 
         y_true_all = []
         for lbl_ in df.label:
             y_true_all.append(label_to_index[lbl_])
 
-        predictions = test(model, df["text"], y_true_all, use_gpu)
+        predictions = test(model, df["text"], y_true_all, use_gpu, gpu_id)
         for i, p in enumerate(predictions):
             if i == 0:
                 pred = p
