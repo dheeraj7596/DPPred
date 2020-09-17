@@ -209,7 +209,7 @@ if __name__ == "__main__":
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
-            X, y, y_true = get_pseudo_labels(df, label_to_rules)
+            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=50 * i)
 
             # # Get the intersection ones and remove them
             # ints_inds = get_conflict_pseudolabels(label_to_inds)
