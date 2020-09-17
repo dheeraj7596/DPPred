@@ -151,6 +151,8 @@ def get_pseudo_labels(df, label_to_rules, intersection_threshold=50):
 
 
 if __name__ == "__main__":
+    # export PYTHONPATH="${PYTHONPATH}:/home/dheeraj/DPPred/py"
+
     home_path = "/home/dheeraj/DPPred/"
     # home_path = "/Users/dheerajmekala/Work/DPPred/"
     data_home_path = home_path + "data/"
@@ -189,7 +191,10 @@ if __name__ == "__main__":
             print(classification_report(y_true, y))
         else:
             # get high probs predictions for every class
-            dic = {"text": df.iloc[high_quality_inds]["text"], "label": df.iloc[high_quality_inds]["label"]}
+            dic = {"text": [], "label": []}
+            for high_qual_index in high_quality_inds:
+                dic["text"].append(df["text"][high_qual_index])
+                dic["label"].append(pred_labels[high_qual_index])
             df_tmp = pd.DataFrame.from_dict(dic)
 
             # create data for DPPred tmp
