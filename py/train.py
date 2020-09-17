@@ -260,6 +260,7 @@ if __name__ == "__main__":
         print("****************** CLASSIFICATION REPORT ON ALL DATA ********************")
         print(classification_report(df["label"], pred_labels))
         print("*" * 80)
+        pickle.dump(pred_labels, open(data_path + "pred_labels.pkl", "wb"))
 
     # generate pseudo labels from rules
 
