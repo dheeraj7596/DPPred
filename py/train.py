@@ -103,7 +103,7 @@ def arrange_label_to_rules(rules):
     return label_to_rules
 
 
-def get_pseudo_labels(df, label_to_rules):
+def get_pseudo_labels(df, label_to_rules, intersection_threshold=50):
     X = []
     y_true = []
     y = []
@@ -124,10 +124,12 @@ def get_pseudo_labels(df, label_to_rules):
             rule = rules[i]
             intersection = 0
             inds = rule["inds"]
+            intersection_inds = set()
             for l in label_to_inds:
                 if l == label:
                     continue
-                if len(inds.intersection(label_to_inds[l])) > 0:
+                intersection_inds.update(inds.intersection(label_to_inds[l]))
+                if len(intersection_inds) > intersection_threshold:
                     intersection = 1
                     break
             # compute intersection of rule with all other pseudo labels
@@ -135,12 +137,16 @@ def get_pseudo_labels(df, label_to_rules):
                 flagged.append(label)
             else:
                 # generate pseudo labels using inds
-                label_to_inds[label].update(inds)
-                X += list(df.iloc[inds]["text"])
-                y_true += list(df.iloc[inds]["label"])
-                for i in inds:
-                    y.append(label)
+                selected_inds = inds - intersection_inds
+                label_to_inds[label].update(selected_inds)
         i += 1
+
+    for l in label_to_inds:
+        inds = list(label_to_inds[l])
+        X += list(df.iloc[inds]["text"])
+        y_true += list(df.iloc[inds]["label"])
+        for index in inds:
+            y.append(l)
     return X, y_true, y
 
 
@@ -150,6 +156,9 @@ if __name__ == "__main__":
     data_home_path = home_path + "data/"
     out_path = home_path + "output/"
 
+    # use_gpu = 0
+    # threshold = 0.4
+    # gpu_id = 0
     use_gpu = int(sys.argv[1])
     threshold = float(sys.argv[2])
     gpu_id = int(sys.argv[3])
@@ -167,9 +176,11 @@ if __name__ == "__main__":
     labels, label_to_index, index_to_label = get_distinct_labels(df)
     bow_train = BOW(df["text"], tokenizer, index_word)
 
-    it = 9
+    it = 5
 
     for i in range(it):
+        # i = 1
+        # high_quality_inds = range(len(df))
         print("Iteration: ", i)
         if i == 0:
             print("Generating pseudo labels from seed words")
