@@ -147,7 +147,7 @@ def get_pseudo_labels(df, label_to_rules, intersection_threshold=50):
         y_true += list(df.iloc[inds]["label"])
         for index in inds:
             y.append(l)
-    return X, y_true, y
+    return X, y, y_true
 
 
 if __name__ == "__main__":
