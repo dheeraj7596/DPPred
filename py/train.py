@@ -171,10 +171,13 @@ if __name__ == "__main__":
     data_path = base_path + dataset + "/"
 
     df = pickle.load(open(data_path + "df.pkl", "rb"))
+    df = df[~df.label.isin(["science"])]
+    df = df.reset_index(drop=True)
     df = preprocess_df(df)
     tokenizer = pickle.load(open(data_path + "tokenizer.pkl", "rb"))
     word_index, index_word = build_vocab(tokenizer)
     label_term_dict = json.load(open(data_path + "seedwords.json", "r"))
+    label_term_dict.pop("science", None)
     labels, label_to_index, index_to_label = get_distinct_labels(df)
     bow_train = BOW(df["text"], tokenizer, index_word)
 
@@ -210,7 +213,7 @@ if __name__ == "__main__":
             lines = f.readlines()
             f.close()
             rules = process_rules(lines)
-            rules = associate_rules_to_labels(rules, word_index, bow_train, list(df["label"]))
+            rules = associate_rules_to_labels(rules, word_index, bow_train, pred_labels)
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
