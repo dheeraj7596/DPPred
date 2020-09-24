@@ -46,7 +46,7 @@ if strcmp(task, 'classification') == 1
 		end
 	end
 	accuracy = hit / m
-	
+	conf_mat = confusionmat(test_y, pred)
 
 	
 	exit;
