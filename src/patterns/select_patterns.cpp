@@ -44,7 +44,7 @@ Rules selectRulesGLMNET(Rules &rules, int topK, vector<double> &labels, string t
 int main(int argc, char* argv[])
 {
     int topK = 0;
-	if (argc != 6 || sscanf(argv[3], "%d", &topK) != 1) {
+	if (argc != 7 || sscanf(argv[3], "%d", &topK) != 1) {
 		fprintf(stderr, "[usage] <training data, csv format> <candidate rules> <top-k rules> <output selected rules> <task_type>\n");
 		return -1;
 	}
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
 	Rules selected = selectRulesGLMNET(rules, topK, trainY, argv[5]);
 
-    FILE* rulesOut = tryOpen("../output/rules.txt", "w");
+    FILE* rulesOut = tryOpen("../output/" + std::string(argv[6]) + "/rules.txt", "w");
 	cerr << "[Selected Top " << topK << " Rules]" << endl;
 	for (int i = 0; i < selected.size(); ++ i) {
 	    cerr << selected[i].loss << "\t" << selected[i].showup(featureNames) << endl;

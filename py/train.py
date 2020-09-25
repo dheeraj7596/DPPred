@@ -171,13 +171,13 @@ if __name__ == "__main__":
     data_path = base_path + dataset + "/"
 
     df = pickle.load(open(data_path + "df.pkl", "rb"))
-    df = df[~df.label.isin(["science"])]
-    df = df.reset_index(drop=True)
+    # df = df[~df.label.isin(["science"])]
+    # df = df.reset_index(drop=True)
     df = preprocess_df(df)
     tokenizer = pickle.load(open(data_path + "tokenizer.pkl", "rb"))
     word_index, index_word = build_vocab(tokenizer)
     label_term_dict = json.load(open(data_path + "seedwords.json", "r"))
-    label_term_dict.pop("science", None)
+    # label_term_dict.pop("science", None)
     labels, label_to_index, index_to_label = get_distinct_labels(df)
     bow_train = BOW(df["text"], tokenizer, index_word)
 
@@ -209,7 +209,7 @@ if __name__ == "__main__":
             print("Getting discriminative patterns")
             rc = subprocess.call(home_path + "run.sh" + " tmp classification", shell=True)
             print("End of DPPred")
-            f = open(out_path + "rules.txt", "r")
+            f = open(out_path + dataset + "/rules.txt", "r")
             lines = f.readlines()
             f.close()
             rules = process_rules(lines)
@@ -217,7 +217,7 @@ if __name__ == "__main__":
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
-            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=50 * i)
+            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=0)
 
             # # Get the intersection ones and remove them
             # ints_inds = get_conflict_pseudolabels(label_to_inds)

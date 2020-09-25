@@ -25,7 +25,7 @@ mkdir tmp/${dataset}
 
 ./bin/produce_candidate_patterns data/${dataset}/train.csv ${task_type} tmp/${dataset}/rule_set ${MIN_SUP} ${MAX_DEPTH} ${RANDOM_FEATURES} ${RANDOM_POSITIONS} ${TREES}
 cd glmnet_matlab
-../bin/select_patterns ../data/${dataset}/train.csv ../tmp/${dataset}/rule_set ${TOPK} ../tmp/${dataset}/top_${TOPK}_rules_set ${task_type}
+../bin/select_patterns ../data/${dataset}/train.csv ../tmp/${dataset}/rule_set ${TOPK} ../tmp/${dataset}/top_${TOPK}_rules_set ${task_type} ${dataset}
 cd ..
 
 ./bin/rebuild_features data/${dataset}/train.csv tmp/${dataset}/top_${TOPK}_rules_set tmp/${dataset}/train.top_${TOPK}.csv ${TOPK}
