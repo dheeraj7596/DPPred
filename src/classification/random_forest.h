@@ -103,7 +103,7 @@ public:
 
 	DecisionTree() {}
 
-	void train(const vector< vector<double> > &features, const vector<double> &results, int minNodeSize, int maxLevel = 18, vector<string> featureNames = vector<string>()) {
+	void train(const vector< vector<double> > &features, const vector<double> &results, unordered_map<double, vector<int> > &labelBuckets, int minNodeSize, int maxLevel = 18, vector<string> featureNames = vector<string>()) {
         int threadID = omp_get_thread_num();
 	    if (features.size() == 0) {
 	        return;
@@ -135,10 +135,23 @@ public:
 
         // bootstrapping
 		vector<int> rootBag;
-		int samplesN = max((int)results.size(), 100);
-		for (int i = 0; i < samplesN; ++ i) {
-            rootBag.push_back(rng[threadID].next(results.size()));
+//		int samplesN = max((int)results.size(), 100);
+//		for (int i = 0; i < samplesN; ++ i) {
+//            rootBag.push_back(rng[threadID].next(results.size()));
+//		}
+
+		vector<double> distinctLabels;
+		for (auto kv : labelBuckets){
+		    distinctLabels.push_back(kv.first);
 		}
+		int numLabels = (int)distinctLabels.size();
+		for (int i = 0; i < numLabels; ++i) {
+            for (int j = 0; j < 50; ++j) {
+                int ind = labelBuckets[distinctLabels[i]][rng[threadID].next(labelBuckets[distinctLabels[i]].size())];
+                rootBag.push_back(ind);
+            }
+        }
+		int samplesN = max((int)results.size(), 50 * numLabels);
 
 		vector<vector<int>> nodeBags;
 		nodeBags.push_back(rootBag);
@@ -371,11 +384,18 @@ public:
     			featureImportance.resize(features[0].size(), 0);
 			}
 		}
+
+        unordered_map<double, vector<int>> labelBuckets;
+        for (int i = 0; i < (int)results.size(); ++i) {
+            double lbl = results[i];
+	        labelBuckets[lbl].push_back(i);
+        }
+
 		myAssert(features.size() == results.size(), "[ERROR] wrong training data!");
         trees.resize(treesNo);
         #pragma omp parallel for
 		for (int i = 0; i < treesNo; ++ i) {
-			trees[i].train(_features, _results, minNodeSize, maxLevel, featureNames);
+			trees[i].train(_features, _results, labelBuckets, minNodeSize, maxLevel, featureNames);
 		}
 	}
 
