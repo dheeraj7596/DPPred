@@ -34,6 +34,7 @@ if strcmp(task, 'classification') == 1
 		end
 	end
 	train_accuracy = hit / m
+	train_conf_mat = confusionmat(train_y, train_pred)
 
 	pred = glmnetPredict(fit.glmnet_fit, test_x, fit.lambda_min, 'class');
 	m = length(pred);
