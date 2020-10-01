@@ -264,6 +264,7 @@ if __name__ == "__main__":
         print(classification_report(df["label"], pred_labels))
         print("*" * 80)
         pickle.dump(pred_labels, open(data_path + "pred_labels.pkl", "wb"))
+        pickle.dump(high_quality_inds, open(data_path + "high_quality_inds.pkl", "wb"))
 
     # generate pseudo labels from rules
 

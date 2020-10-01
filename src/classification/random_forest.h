@@ -151,6 +151,7 @@ public:
                 rootBag.push_back(ind);
             }
         }
+        cout << "Number of samples in rootBag: " << (int)rootBag.size() << endl;
 		int samplesN = max((int)results.size(), 50 * numLabels);
 
 		vector<vector<int>> nodeBags;
