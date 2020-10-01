@@ -58,8 +58,9 @@ def bert_tokenize(tokenizer, sentences, labels):
     attention_masks = torch.cat(attention_masks, dim=0)
     labels = torch.tensor(labels)
     # Print sentence 0, now as a list of IDs.
-    print('Original: ', sentences[0])
-    print('Token IDs:', input_ids[0])
+
+    # print('Original: ', sentences[0])
+    # print('Token IDs:', input_ids[0])
     return input_ids, attention_masks, labels
 
 
@@ -149,9 +150,9 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
 
         # Perform one full pass over the training set.
 
-        print("")
-        print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs))
-        print('Training...')
+        print("", flush=True)
+        print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs), flush=True)
+        print('Training...', flush=True)
 
         # Measure how long the training epoch takes.
         t0 = time.time()
@@ -174,7 +175,7 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
                 elapsed = format_time(time.time() - t0)
 
                 # Report progress.
-                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_dataloader), elapsed))
+                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_dataloader), elapsed), flush=True)
 
             # Unpack this training batch from our dataloader.
             #
@@ -234,9 +235,9 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
         # Measure how long this epoch took.
         training_time = format_time(time.time() - t0)
 
-        print("")
-        print("  Average training loss: {0:.2f}".format(avg_train_loss))
-        print("  Training epcoh took: {:}".format(training_time))
+        print("", flush=True)
+        print("  Average training loss: {0:.2f}".format(avg_train_loss), flush=True)
+        print("  Training epcoh took: {:}".format(training_time), flush=True)
 
         # ========================================
         #               Validation
@@ -244,8 +245,8 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
         # After the completion of each training epoch, measure our performance on
         # our validation set.
 
-        print("")
-        print("Running Validation...")
+        print("", flush=True)
+        print("Running Validation...", flush=True)
 
         t0 = time.time()
 
@@ -301,7 +302,7 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
 
         # Report the final accuracy for this validation run.
         avg_val_accuracy = total_eval_accuracy / len(validation_dataloader)
-        print("  Accuracy: {0:.2f}".format(avg_val_accuracy))
+        print("  Accuracy: {0:.2f}".format(avg_val_accuracy), flush=True)
 
         # Calculate the average loss over all of the batches.
         avg_val_loss = total_eval_loss / len(validation_dataloader)
@@ -309,8 +310,8 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
         # Measure how long the validation run took.
         validation_time = format_time(time.time() - t0)
 
-        print("  Validation Loss: {0:.2f}".format(avg_val_loss))
-        print("  Validation took: {:}".format(validation_time))
+        print("  Validation Loss: {0:.2f}".format(avg_val_loss), flush=True)
+        print("  Validation took: {:}".format(validation_time), flush=True)
 
         # Record all statistics from this epoch.
         training_stats.append(
@@ -324,10 +325,10 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
             }
         )
 
-    print("")
-    print("Training complete!")
+    print("", flush=True)
+    print("Training complete!", flush=True)
 
-    print("Total training took {:} (h:mm:ss)".format(format_time(time.time() - total_t0)))
+    print("Total training took {:} (h:mm:ss)".format(format_time(time.time() - total_t0)), flush=True)
     return model
 
 
