@@ -186,12 +186,12 @@ if __name__ == "__main__":
     for i in range(it):
         # i = 1
         # high_quality_inds = range(len(df))
-        print("Iteration: ", i)
+        print("Iteration: ", i, flush=True)
         if i == 0:
             print("Generating pseudo labels from seed words")
             X, y, y_true = generate_pseudo_labels(df, labels, label_term_dict, tokenizer)
             print("****************** CLASSIFICATION REPORT FOR Seedwords Pseudolabels ********************")
-            print(classification_report(y_true, y))
+            print(classification_report(y_true, y), flush=True)
         else:
             # get high probs predictions for every class
             dic = {"text": [], "label": []}
@@ -206,9 +206,9 @@ if __name__ == "__main__":
 
             dump_excel(df_tmp, tmp_path, tokenizer)
 
-            print("Getting discriminative patterns")
+            print("Getting discriminative patterns", flush=True)
             rc = subprocess.call(home_path + "run.sh" + " tmp classification", shell=True)
-            print("End of DPPred")
+            print("End of DPPred", flush=True)
             f = open(out_path + dataset + "/rules.txt", "r")
             lines = f.readlines()
             f.close()
@@ -234,8 +234,8 @@ if __name__ == "__main__":
             #     for i in inds:
             #         y.append(l)
 
-            print("****************** CLASSIFICATION REPORT FOR Rules Pseudolabels ********************")
-            print(classification_report(y_true, y))
+            print("****************** CLASSIFICATION REPORT FOR Rules Pseudolabels ********************", flush=True)
+            print(classification_report(y_true, y), flush=True)
 
         y_vec = []
         for lbl_ in y:
@@ -260,9 +260,9 @@ if __name__ == "__main__":
             if (p.max(axis=-1) >= threshold):
                 high_quality_inds.append(i)
 
-        print("****************** CLASSIFICATION REPORT ON ALL DATA ********************")
-        print(classification_report(df["label"], pred_labels))
-        print("*" * 80)
+        print("****************** CLASSIFICATION REPORT ON ALL DATA ********************", flush=True)
+        print(classification_report(df["label"], pred_labels), flush=True)
+        print("*" * 80, flush=True)
         pickle.dump(pred_labels, open(data_path + "pred_labels.pkl", "wb"))
         pickle.dump(high_quality_inds, open(data_path + "high_quality_inds.pkl", "wb"))
 
