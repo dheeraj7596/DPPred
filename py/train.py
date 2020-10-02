@@ -183,7 +183,7 @@ if __name__ == "__main__":
 
     it = 5
 
-    for i in range(1, it):
+    for i in range(it):
         # i = 1
         # high_quality_inds = range(len(df))
         print("Iteration: ", i, flush=True)
@@ -194,9 +194,9 @@ if __name__ == "__main__":
             print(classification_report(y_true, y), flush=True)
         else:
             # get high probs predictions for every class
-            if i == 1:
-                high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
-                pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
+            # if i == 1:
+            #     high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
+            #     pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
             dic = {"text": [], "label": []}
             for high_qual_index in high_quality_inds:
                 dic["text"].append(df["text"][high_qual_index])
