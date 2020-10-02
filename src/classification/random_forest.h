@@ -146,8 +146,10 @@ public:
 		}
 		int numLabels = (int)distinctLabels.size();
 		for (int i = 0; i < numLabels; ++i) {
+		    cout << "For label " << distinctLabels[i] << endl;
             for (int j = 0; j < 50; ++j) {
                 int ind = labelBuckets[distinctLabels[i]][rng[threadID].next(labelBuckets[distinctLabels[i]].size())];
+                cout << ind << endl;
                 rootBag.push_back(ind);
             }
         }
