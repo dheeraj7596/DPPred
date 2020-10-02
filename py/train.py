@@ -204,7 +204,7 @@ if __name__ == "__main__":
             df_tmp = pd.DataFrame.from_dict(dic)
 
             # create data for DPPred tmp
-            tmp_path = data_home_path + "tmp/"
+            tmp_path = data_home_path + dataset + "/"
             os.makedirs(tmp_path, exist_ok=True)
 
             dump_excel(df_tmp, tmp_path, tokenizer)
