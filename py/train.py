@@ -210,7 +210,7 @@ if __name__ == "__main__":
             dump_excel(df_tmp, tmp_path, tokenizer)
 
             print("Getting discriminative patterns", flush=True)
-            rc = subprocess.call(home_path + "run.sh" + " tmp classification", shell=True)
+            rc = subprocess.call(home_path + "run.sh " + dataset + " classification", shell=True)
             print("End of DPPred", flush=True)
             f = open(out_path + dataset + "/rules.txt", "r")
             lines = f.readlines()
