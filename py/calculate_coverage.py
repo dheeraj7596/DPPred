@@ -19,22 +19,22 @@ def process_rules(lines):
 
             if len(comp.split(">=")) > 1:
                 args = comp.split(">=")
-                assert float(args[1].strip()) == 0.5
+                # assert float(args[1].strip()) == 0.5
                 rule["contains"].append(args[0].strip().split("=")[-1].strip())
 
             elif len(comp.split("<=")) > 1:
                 args = comp.split("<=")
-                assert float(args[1].strip()) == 0.5
+                # assert float(args[1].strip()) == 0.5
                 rule["not contains"].append(args[0].strip().split("=")[-1].strip())
 
             elif len(comp.split("<")) > 1:
                 args = comp.split("<")
-                assert float(args[1].strip()) == 0.5
+                # assert float(args[1].strip()) == 0.5
                 rule["not contains"].append(args[0].strip().split("=")[-1].strip())
 
             elif len(comp.split(">")) > 1:
                 args = comp.split(">")
-                assert float(args[1].strip()) == 0.5
+                # assert float(args[1].strip()) == 0.5
                 rule["contains"].append(args[0].strip().split("=")[-1].strip())
 
             else:
