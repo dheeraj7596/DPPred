@@ -7,6 +7,8 @@ from nltk.corpus import stopwords
 from py.util import fit_get_tokenizer
 import numpy as np
 import string
+from nltk import sent_tokenize
+from string import punctuation
 import pandas as pd
 
 
@@ -86,7 +88,7 @@ def dump_excel(df, path, tokenizer):
     num_cols = bow_train.shape[1]
     cols = []
     for i in range(num_cols):
-        cols.append(index_word[i])
+        cols.append("word=" + index_word[i])
 
     df_train = pd.DataFrame(data=bow_train, columns=cols)
     df_train["label"] = y_train_index
@@ -97,17 +99,55 @@ def dump_excel(df, path, tokenizer):
     df_test.to_csv(path + "test.csv", index=False)
 
 
+# def preprocess_df(df):
+#     stop_words = set(stopwords.words('english'))
+#     stop_words.add('would')
+#     translator = str.maketrans(string.punctuation, ' ' * len(string.punctuation))
+#     preprocessed_sentences = []
+#     preprocessed_labels = []
+#     for i, row in df.iterrows():
+#         label = row["label"]
+#         sent = row["text"]
+#         sent_nopuncts = sent.translate(translator)
+#         words_list = sent_nopuncts.strip().split()
+#         filtered_words = [word for word in words_list if word not in stop_words and len(word) != 1]
+#         preprocessed_sentences.append(" ".join(filtered_words))
+#         preprocessed_labels.append(label)
+#     df["text"] = preprocessed_sentences
+#     df["label"] = preprocessed_labels
+#     return df
+
+def clean_str(text):
+    text = text.replace('"', '')
+    text = text.replace("'", '')
+    text = text.replace(",", ' ')
+    sentences = sent_tokenize(text)
+    new_sentences = []
+    for sent in sentences:
+        sent = sent.strip(punctuation)
+        new_sent = []
+        for w in sent.strip().split():
+            if w.isalpha():
+                new_sent.append(w)
+        if len(new_sent) > 1:
+            new_sentences.append(" ".join(new_sent))
+    if len(new_sentences) > 0:
+        text = " . ".join(new_sentences)
+        return text
+    else:
+        print("Empty text")
+        return " "
+
 def preprocess_df(df):
     stop_words = set(stopwords.words('english'))
     stop_words.add('would')
-    translator = str.maketrans(string.punctuation, ' ' * len(string.punctuation))
     preprocessed_sentences = []
     preprocessed_labels = []
     for i, row in df.iterrows():
         label = row["label"]
         sent = row["text"]
-        sent_nopuncts = sent.translate(translator)
-        words_list = sent_nopuncts.strip().split()
+        sent = clean_str(sent)
+        words_list = sent.strip().split()
         filtered_words = [word for word in words_list if word not in stop_words and len(word) != 1]
         preprocessed_sentences.append(" ".join(filtered_words))
         preprocessed_labels.append(label)
