@@ -159,7 +159,7 @@ def preprocess_df(df):
 if __name__ == "__main__":
     # base_path = "/data4/dheeraj/discpattern/"
     base_path = "/Users/dheerajmekala/Work/DPPred/data/"
-    dataset = "nyt_fine"
+    dataset = "nyt_coarse"
     data_path = base_path + dataset + "/"
     df = pickle.load(open(data_path + "df.pkl", "rb"))
     df = preprocess_df(df)
