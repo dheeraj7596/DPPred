@@ -67,7 +67,7 @@ def train(df, tokenizer):
     return clf
 
 
-def dump_excel(df, path, tokenizer):
+def dump_excel(df, path, tokenizer, mode="all"):
     word_index, index_word = build_vocab(tokenizer)
     labels = set(df.label)
     label_to_index = {}
@@ -79,9 +79,14 @@ def dump_excel(df, path, tokenizer):
 
     X_train, X_test, y_train, y_test = train_test_split(df["text"], df["label"], test_size=0.1, random_state=42,
                                                         stratify=df["label"])
-    bow_train = BOW(X_train, tokenizer, index_word)
+    if mode == "all":
+        bow_train = BOW(df["text"], tokenizer, index_word)
+        y_train_index = make_index(df["label"], label_to_index)
+    else:
+        bow_train = BOW(X_train, tokenizer, index_word)
+        y_train_index = make_index(y_train, label_to_index)
+
     bow_test = BOW(X_test, tokenizer, index_word)
-    y_train_index = make_index(y_train, label_to_index)
     y_test_index = make_index(y_test, label_to_index)
 
     index_word[0] = "NAN"
@@ -138,6 +143,7 @@ def clean_str(text):
         print("Empty text")
         return " "
 
+
 def preprocess_df(df):
     stop_words = set(stopwords.words('english'))
     stop_words.add('would')
@@ -166,4 +172,4 @@ if __name__ == "__main__":
     tokenizer = fit_get_tokenizer(df.text, max_words=150000)
 
     pickle.dump(tokenizer, open(data_path + "tokenizer.pkl", "wb"))
-    dump_excel(df, data_path, tokenizer)
+    dump_excel(df, data_path, tokenizer, mode="some")

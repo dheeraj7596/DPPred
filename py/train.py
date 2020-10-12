@@ -207,7 +207,7 @@ if __name__ == "__main__":
             tmp_path = data_home_path + dataset + "/"
             os.makedirs(tmp_path, exist_ok=True)
 
-            dump_excel(df_tmp, tmp_path, tokenizer)
+            dump_excel(df_tmp, tmp_path, tokenizer, mode="all")
 
             print("Getting discriminative patterns", flush=True)
             rc = subprocess.call(home_path + "run.sh " + dataset + " classification", shell=True)
