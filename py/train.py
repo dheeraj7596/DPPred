@@ -207,6 +207,8 @@ if __name__ == "__main__":
             tmp_path = data_home_path + dataset + "/"
             os.makedirs(tmp_path, exist_ok=True)
 
+            print(df_tmp.label.value_counts())
+
             dump_excel(df_tmp, tmp_path, tokenizer, mode="all")
 
             print("Getting discriminative patterns", flush=True)
@@ -220,7 +222,7 @@ if __name__ == "__main__":
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
-            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=0)
+            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=5)
 
             # # Get the intersection ones and remove them
             # ints_inds = get_conflict_pseudolabels(label_to_inds)
