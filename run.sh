@@ -11,15 +11,15 @@ task_type=$2
 tmp="/data4/dheeraj/discpattern/tmp"
 data="/data4/dheeraj/discpattern/data"
 
-TOPK=800
+TOPK=2000
 
 MIN_SUP=10
-MAX_DEPTH=6
+MAX_DEPTH=7
 
-RANDOM_FEATURES=1500
+RANDOM_FEATURES=3000
 RANDOM_POSITIONS=8
 
-TREES=100
+TREES=200
 
 make
 
