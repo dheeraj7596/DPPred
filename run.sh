@@ -41,5 +41,5 @@ TRAIN_PRED=${tmp}/${dataset}/train_pred
 TEST_PRED=${tmp}/${dataset}/test_pred
 
 cd glmnet_matlab
-../bin/predict ../${NEW_TRAIN} ../${NEW_TEST} ../${TEST_PRED} ../${TRAIN_PRED} ${task_type}
+../bin/predict ${NEW_TRAIN} ${NEW_TEST} ${TEST_PRED} ${TRAIN_PRED} ${task_type}
 cd ..
