@@ -182,6 +182,7 @@ if __name__ == "__main__":
     bow_train = BOW(df["text"], tokenizer, index_word)
 
     it = 5
+    rules = []
 
     for i in range(it):
         # i = 1
@@ -222,7 +223,7 @@ if __name__ == "__main__":
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
-            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=5)
+            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=10)
 
             # # Get the intersection ones and remove them
             # ints_inds = get_conflict_pseudolabels(label_to_inds)
@@ -270,7 +271,15 @@ if __name__ == "__main__":
         print("*" * 80, flush=True)
         pickle.dump(pred_labels, open(data_path + "pred_labels.pkl", "wb"))
         pickle.dump(high_quality_inds, open(data_path + "high_quality_inds.pkl", "wb"))
-        df_res = pd.DataFrame.from_dict({"text": df["text"], "pred_label": pred_labels, "true_label": df["label"]})
+        res_dic = {"text": df["text"], "pred_label": pred_labels, "true_label": df["label"]}
+        for l in labels:
+            res_dic[l] = [0] * len(df["text"])
+        for rule in rules:
+            inds = rule["inds"]
+            for ind in inds:
+                res_dic[rule["label"]][ind] += 1
+
+        df_res = pd.DataFrame.from_dict(res_dic)
         df_res.to_csv(data_path + "df_res_it_" + str(i) + ".csv")
 
     # generate pseudo labels from rules
