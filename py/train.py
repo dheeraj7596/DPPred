@@ -155,7 +155,6 @@ if __name__ == "__main__":
 
     home_path = "/home/dheeraj/DPPred/"
     # home_path = "/Users/dheerajmekala/Work/DPPred/"
-    data_home_path = home_path + "data/"
     out_path = home_path + "output/"
 
     # use_gpu = 0
@@ -169,6 +168,7 @@ if __name__ == "__main__":
     # base_path = "/Users/dheerajmekala/Work/DPPred/data/"
     dataset = "nyt_coarse"
     data_path = base_path + dataset + "/"
+    dppred_data_path = base_path + "data/"  # Path from which DPPred model takes in data.
 
     df = pickle.load(open(data_path + "df.pkl", "rb"))
     # df = df[~df.label.isin(["science"])]
@@ -204,7 +204,7 @@ if __name__ == "__main__":
             df_tmp = pd.DataFrame.from_dict(dic)
 
             # create data for DPPred tmp
-            tmp_path = data_home_path + dataset + "/"
+            tmp_path = dppred_data_path + dataset + "/"
             os.makedirs(tmp_path, exist_ok=True)
 
             print(df_tmp.label.value_counts())
@@ -270,6 +270,8 @@ if __name__ == "__main__":
         print("*" * 80, flush=True)
         pickle.dump(pred_labels, open(data_path + "pred_labels.pkl", "wb"))
         pickle.dump(high_quality_inds, open(data_path + "high_quality_inds.pkl", "wb"))
+        df_res = pd.DataFrame.from_dict({"text": df["text"], "pred_label": pred_labels, "true_label": df["label"]})
+        df_res.to_csv(data_path + "df_res_it_" + str(i) + ".csv")
 
     # generate pseudo labels from rules
 
