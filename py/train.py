@@ -181,23 +181,23 @@ if __name__ == "__main__":
     labels, label_to_index, index_to_label = get_distinct_labels(df)
     bow_train = BOW(df["text"], tokenizer, index_word)
 
-    it = 5
+    it = 8
     rules = []
 
-    for i in range(it):
+    for iteration in range(5, it):
         # i = 1
         # high_quality_inds = range(len(df))
-        print("Iteration: ", i, flush=True)
-        if i == 0:
+        print("Iteration: ", iteration, flush=True)
+        if iteration == 0:
             print("Generating pseudo labels from seed words")
             X, y, y_true = generate_pseudo_labels(df, labels, label_term_dict, tokenizer)
             print("****************** CLASSIFICATION REPORT FOR Seedwords Pseudolabels ********************")
             print(classification_report(y_true, y), flush=True)
         else:
             # get high probs predictions for every class
-            # if i == 1:
-            #     high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
-            #     pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
+            if iteration == 5:
+                high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
+                pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
             dic = {"text": [], "label": []}
             for high_qual_index in high_quality_inds:
                 dic["text"].append(df["text"][high_qual_index])
@@ -280,7 +280,7 @@ if __name__ == "__main__":
                 res_dic[rule["label"]][ind] += 1
 
         df_res = pd.DataFrame.from_dict(res_dic)
-        df_res.to_csv(data_path + "df_res_it_" + str(i) + ".csv")
+        df_res.to_csv(data_path + "df_res_it_" + str(iteration) + ".csv")
 
     # generate pseudo labels from rules
 
