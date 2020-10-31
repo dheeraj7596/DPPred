@@ -181,10 +181,10 @@ if __name__ == "__main__":
     labels, label_to_index, index_to_label = get_distinct_labels(df)
     bow_train = BOW(df["text"], tokenizer, index_word)
 
-    it = 8
+    it = 5
     rules = []
 
-    for iteration in range(5, it):
+    for iteration in range(it):
         # i = 1
         # high_quality_inds = range(len(df))
         print("Iteration: ", iteration, flush=True)
@@ -195,9 +195,9 @@ if __name__ == "__main__":
             print(classification_report(y_true, y), flush=True)
         else:
             # get high probs predictions for every class
-            if iteration == 5:
-                high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
-                pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
+            # if iteration == 5:
+            #     high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
+            #     pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
             dic = {"text": [], "label": []}
             for high_qual_index in high_quality_inds:
                 dic["text"].append(df["text"][high_qual_index])
