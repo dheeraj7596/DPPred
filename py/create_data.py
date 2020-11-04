@@ -67,7 +67,7 @@ def train(df, tokenizer):
     return clf
 
 
-def dump_excel(df, path, tokenizer, mode="all"):
+def dump_excel(df, path, tokenizer, mode="all", is_categorical=True):
     word_index, index_word = build_vocab(tokenizer)
     labels = set(df.label)
     label_to_index = {}
@@ -93,7 +93,10 @@ def dump_excel(df, path, tokenizer, mode="all"):
     num_cols = bow_train.shape[1]
     cols = []
     for i in range(num_cols):
-        cols.append("word=" + index_word[i])
+        if is_categorical:
+            cols.append("word=" + index_word[i])
+        else:
+            cols.append(index_word[i])
 
     df_train = pd.DataFrame(data=bow_train, columns=cols)
     df_train["label"] = y_train_index

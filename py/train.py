@@ -210,7 +210,7 @@ if __name__ == "__main__":
 
             print(df_tmp.label.value_counts())
 
-            dump_excel(df_tmp, tmp_path, tokenizer, mode="all")
+            dump_excel(df_tmp, tmp_path, tokenizer, mode="all", is_categorical=False)
 
             print("Getting discriminative patterns", flush=True)
             rc = subprocess.call(home_path + "run.sh " + dataset + " classification", shell=True)
