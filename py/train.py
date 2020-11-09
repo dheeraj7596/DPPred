@@ -176,6 +176,7 @@ if __name__ == "__main__":
     df = preprocess_df(df)
     tokenizer = pickle.load(open(data_path + "tokenizer.pkl", "rb"))
     word_index, index_word = build_vocab(tokenizer)
+    word_cluster_dict = pickle.load(open(data_path + "word_cluster_dict.pkl", "rb"))
     label_term_dict = json.load(open(data_path + "seedwords.json", "r"))
     # label_term_dict.pop("science", None)
     labels, label_to_index, index_to_label = get_distinct_labels(df)
@@ -210,7 +211,7 @@ if __name__ == "__main__":
 
             print(df_tmp.label.value_counts())
 
-            dump_excel(df_tmp, tmp_path, tokenizer, mode="all", is_categorical=False)
+            dump_excel(df_tmp, tmp_path, tokenizer, mode="all", is_categorical=True, word_cluster_map=word_cluster_dict)
 
             print("Getting discriminative patterns", flush=True)
             rc = subprocess.call(home_path + "run.sh " + dataset + " classification", shell=True)

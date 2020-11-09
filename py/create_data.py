@@ -67,7 +67,7 @@ def train(df, tokenizer):
     return clf
 
 
-def dump_excel(df, path, tokenizer, mode="all", is_categorical=True):
+def dump_excel(df, path, tokenizer, mode="all", is_categorical=True, word_cluster_map=None):
     word_index, index_word = build_vocab(tokenizer)
     labels = set(df.label)
     label_to_index = {}
@@ -94,7 +94,11 @@ def dump_excel(df, path, tokenizer, mode="all", is_categorical=True):
     cols = []
     for i in range(num_cols):
         if is_categorical:
-            cols.append("word=" + index_word[i])
+            if word_cluster_map is None:
+                cols.append("word=" + index_word[i])
+            else:
+                temp_word = index_word[i]
+                cols.append("word_" + str(word_cluster_map[temp_word]) + "=" + index_word[i])
         else:
             cols.append(index_word[i])
 
