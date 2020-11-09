@@ -18,16 +18,19 @@ if __name__ == "__main__":
     word_index, index_word = build_vocab(tokenizer)
 
     tok_vecs = []
+    success_inds = []
+
     for i in index_word:
         try:
             tok_vecs.append(embeddings[index_word[i]])
+            success_inds.append(i)
         except:
             continue
 
     km.fit(tok_vecs)
     clusters = km.labels_
     word_cluster_dict = {}
-    for i in index_word:
+    for i in success_inds:
         word_cluster_dict[index_word[i]] = clusters[i]
 
     pickle.dump(word_cluster_dict, open(data_path + "word_cluster_dict.pkl", "wb"))
