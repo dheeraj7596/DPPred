@@ -30,7 +30,7 @@ if __name__ == "__main__":
     km.fit(tok_vecs)
     clusters = km.labels_
     word_cluster_dict = {}
-    for i in success_inds:
-        word_cluster_dict[index_word[i]] = clusters[i]
+    for i, ind in enumerate(success_inds):
+        word_cluster_dict[index_word[ind]] = clusters[i]
 
     pickle.dump(word_cluster_dict, open(data_path + "word_cluster_dict.pkl", "wb"))
