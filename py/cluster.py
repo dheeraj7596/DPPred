@@ -16,11 +16,13 @@ if __name__ == "__main__":
     embeddings = word2vec.Word2Vec.load(data_path + "word2vec.model")
     tokenizer = pickle.load(open(data_path + "tokenizer.pkl", "rb"))
     word_index, index_word = build_vocab(tokenizer)
-    index_word = sorted(index_word)
 
     tok_vecs = []
     for i in index_word:
-        tok_vecs.append(embeddings[index_word[i]])
+        try:
+            tok_vecs.append(embeddings[index_word[i]])
+        except:
+            continue
 
     km.fit(tok_vecs)
     clusters = km.labels_

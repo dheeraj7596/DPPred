@@ -98,7 +98,10 @@ def dump_excel(df, path, tokenizer, mode="all", is_categorical=True, word_cluste
                 cols.append("word=" + index_word[i])
             else:
                 temp_word = index_word[i]
-                cols.append("word_" + str(word_cluster_map[temp_word]) + "=" + index_word[i])
+                try:
+                    cols.append("word_" + str(word_cluster_map[temp_word]) + "=" + index_word[i])
+                except:
+                    continue
         else:
             cols.append(index_word[i])
 

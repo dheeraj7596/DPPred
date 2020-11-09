@@ -5,7 +5,7 @@ from gensim.models import word2vec
 def train_word2vec(df, dataset_path, tokenizer):
     def get_embeddings(inp_data, vocabulary_inv, size_features=100,
                        mode='skipgram',
-                       min_word_count=2,
+                       min_word_count=1,
                        context=5):
         num_workers = 15  # Number of threads to run in parallel
         downsampling = 1e-3  # Downsample setting for frequent words
@@ -40,6 +40,7 @@ def train_word2vec(df, dataset_path, tokenizer):
     vocabulary_inv = {}
     for word in tokenizer.word_index:
         vocabulary_inv[tokenizer.word_index[word]] = word
+    print("Length of vocab:", len(vocabulary_inv))
     embedding_model = get_embeddings(tagged_data, vocabulary_inv)
     pickle.dump(embedding_model, open(dataset_path + "word2vec.model", "wb"))
 
