@@ -1,5 +1,6 @@
 import pickle
 from gensim.models import word2vec
+from py.create_data import preprocess_df
 
 
 def train_word2vec(df, dataset_path, tokenizer):
@@ -43,6 +44,7 @@ def train_word2vec(df, dataset_path, tokenizer):
     print("Length of vocab:", len(vocabulary_inv))
     embedding_model = get_embeddings(tagged_data, vocabulary_inv)
     pickle.dump(embedding_model, open(dataset_path + "word2vec.model", "wb"))
+    return embedding_model
 
 
 if __name__ == "__main__":
@@ -51,6 +53,7 @@ if __name__ == "__main__":
     dataset = "nyt_coarse"
     data_path = base_path + dataset + "/"
     df = pickle.load(open(data_path + "df.pkl", "rb"))
+    df = preprocess_df(df)
 
     tokenizer = pickle.load(open(data_path + "tokenizer.pkl", "rb"))
-    train_word2vec(df, data_path, tokenizer)
+    embedding_model = train_word2vec(df, data_path, tokenizer)
