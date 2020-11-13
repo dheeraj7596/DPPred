@@ -7,9 +7,43 @@ import subprocess
 from py.calculate_coverage import process_rules, generate_mask
 from py.bert_utils import train_bert, test
 from py.util import get_distinct_labels, most_frequent
+from scipy.special import entr
 import sys
 import pandas as pd
 import os
+import operator
+
+
+def get_pseudo_labels_soft(df, rules, labels, label_to_index):
+    X = []
+    y_true = []
+    y = []
+    ind_to_label_probs = {}
+    for rule in rules:
+        inds = rule["inds"]
+        for i in inds:
+            for lbl_ in labels:
+                try:
+                    ind_to_label_probs[i][lbl_] += rule["probs"][label_to_index[lbl_]]
+                except:
+                    ind_to_label_probs[i] = {}
+                    ind_to_label_probs[i][lbl_] = rule["probs"][label_to_index[lbl_]]
+
+    label_to_inds = {}
+    for i in ind_to_label_probs:
+        lbl = max(ind_to_label_probs[i].items(), key=operator.itemgetter(1))[0]
+        try:
+            label_to_inds[lbl].append(i)
+        except:
+            label_to_inds[lbl] = [i]
+
+    for l in label_to_inds:
+        inds = list(label_to_inds[l])
+        X += list(df.iloc[inds]["text"])
+        y_true += list(df.iloc[inds]["label"])
+        for index in inds:
+            y.append(l)
+    return X, y, y_true
 
 
 def generate_pseudo_labels(df, labels, label_term_dict, tokenizer):
@@ -68,15 +102,21 @@ def generate_pseudo_labels(df, labels, label_term_dict, tokenizer):
     return X, y, y_true
 
 
-def associate_rules_to_labels(rules, word_index, bow_train, labels):
+def associate_rules_to_labels(rules, word_index, bow_train, labels, label_to_index):
     for rule in rules:
         mask = generate_mask(rule, word_index, bow_train)
         inds = list(np.where(mask)[0])
         sampled_labels = []
         for i in inds:
             sampled_labels.append(labels[i])
+        count_arr = []
+        for l in label_to_index:
+            count_arr.append(sampled_labels.count(l))
+        count_arr = np.array(count_arr)
+        rule["probs"] = count_arr / np.linalg.norm(count_arr)
         rule["label"] = most_frequent(sampled_labels)
         rule["inds"] = set(inds)
+        rule["entropy"] = entr(rule["probs"]).sum()
     return rules
 
 
@@ -99,7 +139,7 @@ def arrange_label_to_rules(rules):
             label_to_rules[rule["label"]] = [rule]
 
     for l in label_to_rules:
-        label_to_rules[l] = sorted(label_to_rules[l], key=lambda x: x["rank"])
+        label_to_rules[l] = sorted(label_to_rules[l], key=lambda x: x["entropy"])
     return label_to_rules
 
 
@@ -185,7 +225,7 @@ if __name__ == "__main__":
     it = 5
     rules = []
 
-    for iteration in range(1, it):
+    for iteration in range(it):
         # i = 1
         # high_quality_inds = range(len(df))
         print("Iteration: ", iteration, flush=True)
@@ -196,9 +236,9 @@ if __name__ == "__main__":
             print(classification_report(y_true, y), flush=True)
         else:
             # get high probs predictions for every class
-            if iteration == 1:
-                high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
-                pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
+            # if iteration == 1:
+            #     high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
+            #     pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
             dic = {"text": [], "label": []}
             for high_qual_index in high_quality_inds:
                 dic["text"].append(df["text"][high_qual_index])
@@ -220,11 +260,12 @@ if __name__ == "__main__":
             lines = f.readlines()
             f.close()
             rules = process_rules(lines)
-            rules = associate_rules_to_labels(rules, word_index, bow_train, pred_labels)
+            rules = associate_rules_to_labels(rules, word_index, bow_train, pred_labels, label_to_index)
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
-            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=10)
+            X, y, y_true = get_pseudo_labels_soft(df, rules, labels, label_to_index)
+            # X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=10)
 
             # # Get the intersection ones and remove them
             # ints_inds = get_conflict_pseudolabels(label_to_inds)
@@ -270,8 +311,13 @@ if __name__ == "__main__":
         print("****************** CLASSIFICATION REPORT ON ALL DATA ********************", flush=True)
         print(classification_report(df["label"], pred_labels), flush=True)
         print("*" * 80, flush=True)
-        pickle.dump(pred_labels, open(data_path + "pred_labels.pkl", "wb"))
-        pickle.dump(high_quality_inds, open(data_path + "high_quality_inds.pkl", "wb"))
+
+        if iteration == 0:
+            pickle.dump(pred_labels, open(data_path + "pred_labels_first_it.pkl", "wb"))
+            pickle.dump(high_quality_inds, open(data_path + "high_quality_inds_first_it.pkl", "wb"))
+        else:
+            pickle.dump(pred_labels, open(data_path + "pred_labels.pkl", "wb"))
+            pickle.dump(high_quality_inds, open(data_path + "high_quality_inds.pkl", "wb"))
         res_dic = {"text": df["text"], "pred_label": pred_labels, "true_label": df["label"]}
         for l in labels:
             res_dic[l] = [0] * len(df["text"])
