@@ -7,7 +7,7 @@ import subprocess
 from py.calculate_coverage import process_rules, generate_mask
 from py.bert_utils import train_bert, test
 from py.util import get_distinct_labels, most_frequent
-from scipy.special import entr
+from scipy.stats import entropy
 import sys
 import pandas as pd
 import os
@@ -22,11 +22,14 @@ def get_pseudo_labels_soft(df, rules, labels, label_to_index):
     for rule in rules:
         inds = rule["inds"]
         for i in inds:
+            try:
+                temp = ind_to_label_probs[i]
+            except:
+                ind_to_label_probs[i] = {}
             for lbl_ in labels:
                 try:
                     ind_to_label_probs[i][lbl_] += rule["probs"][label_to_index[lbl_]]
                 except:
-                    ind_to_label_probs[i] = {}
                     ind_to_label_probs[i][lbl_] = rule["probs"][label_to_index[lbl_]]
 
     label_to_inds = {}
@@ -116,7 +119,7 @@ def associate_rules_to_labels(rules, word_index, bow_train, labels, label_to_ind
         rule["probs"] = count_arr / np.linalg.norm(count_arr)
         rule["label"] = most_frequent(sampled_labels)
         rule["inds"] = set(inds)
-        rule["entropy"] = entr(rule["probs"]).sum()
+        rule["entropy"] = entropy(rule["probs"], base=2)
     return rules
 
 
@@ -190,6 +193,18 @@ def get_pseudo_labels(df, label_to_rules, intersection_threshold=50):
     return X, y, y_true
 
 
+def filter_rules(label_to_rules, entropy_threshold=1.5):
+    mod_rules = []
+    mod_label_to_rules = {}
+    for l in label_to_rules:
+        mod_label_to_rules[l] = []
+        for rule in label_to_rules[l]:
+            if rule["entropy"] < entropy_threshold:
+                mod_rules.append(rule)
+                mod_label_to_rules[l].append(rule)
+    return mod_rules, mod_label_to_rules
+
+
 if __name__ == "__main__":
     # export PYTHONPATH="${PYTHONPATH}:/home/dheeraj/DPPred/py"
 
@@ -224,7 +239,7 @@ if __name__ == "__main__":
     it = 5
     rules = []
 
-    for iteration in range(it):
+    for iteration in range(1, it):
         # i = 1
         # high_quality_inds = range(len(df))
         print("Iteration: ", iteration, flush=True)
@@ -235,9 +250,9 @@ if __name__ == "__main__":
             print(classification_report(y_true, y), flush=True)
         else:
             # get high probs predictions for every class
-            # if iteration == 1:
-            #     high_quality_inds = pickle.load(open(data_path + "high_quality_inds.pkl", "rb"))
-            #     pred_labels = pickle.load(open(data_path + "pred_labels.pkl", "rb"))
+            if iteration == 1:
+                high_quality_inds = pickle.load(open(data_path + "high_quality_inds_first_it.pkl", "rb"))
+                pred_labels = pickle.load(open(data_path + "pred_labels_first_it.pkl", "rb"))
             dic = {"text": [], "label": []}
             for high_qual_index in high_quality_inds:
                 dic["text"].append(df["text"][high_qual_index])
@@ -263,8 +278,9 @@ if __name__ == "__main__":
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
-            X, y, y_true = get_pseudo_labels_soft(df, rules, labels, label_to_index)
-            # X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=10)
+            rules, label_to_rules = filter_rules(label_to_rules, entropy_threshold=1.5)
+            # X, y, y_true = get_pseudo_labels_soft(df, rules, labels, label_to_index)
+            X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=10)
 
             # # Get the intersection ones and remove them
             # ints_inds = get_conflict_pseudolabels(label_to_inds)
