@@ -239,7 +239,7 @@ if __name__ == "__main__":
     it = 5
     rules = []
 
-    for iteration in range(1, it):
+    for iteration in range(it):
         # i = 1
         # high_quality_inds = range(len(df))
         print("Iteration: ", iteration, flush=True)
@@ -250,9 +250,9 @@ if __name__ == "__main__":
             print(classification_report(y_true, y), flush=True)
         else:
             # get high probs predictions for every class
-            if iteration == 1:
-                high_quality_inds = pickle.load(open(data_path + "high_quality_inds_first_it.pkl", "rb"))
-                pred_labels = pickle.load(open(data_path + "pred_labels_first_it.pkl", "rb"))
+            # if iteration == 1:
+            #     high_quality_inds = pickle.load(open(data_path + "high_quality_inds_first_it.pkl", "rb"))
+            #     pred_labels = pickle.load(open(data_path + "pred_labels_first_it.pkl", "rb"))
             dic = {"text": [], "label": []}
             for high_qual_index in high_quality_inds:
                 dic["text"].append(df["text"][high_qual_index])
@@ -278,6 +278,7 @@ if __name__ == "__main__":
             label_to_rules = arrange_label_to_rules(rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
+            pickle.dump(rules, open(data_path + "rules.pkl", "wb"))
             rules, label_to_rules = filter_rules(label_to_rules, entropy_threshold=1.5)
             # X, y, y_true = get_pseudo_labels_soft(df, rules, labels, label_to_index)
             X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=10)
