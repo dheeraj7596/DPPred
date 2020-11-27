@@ -112,7 +112,7 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
     # Number of training epochs. The BERT authors recommend between 2 and 4.
     # We chose to run for 4, but we'll see later that this may be over-fitting the
     # training data.
-    epochs = 3
+    epochs = 4
 
     # Total number of training steps is [number of batches] x [number of epochs].
     # (Note that this is not the same as the number of training samples).
@@ -175,7 +175,8 @@ def train(train_dataloader, validation_dataloader, use_gpu, device, num_labels):
                 elapsed = format_time(time.time() - t0)
 
                 # Report progress.
-                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_dataloader), elapsed), flush=True)
+                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_dataloader), elapsed),
+                      flush=True)
 
             # Unpack this training batch from our dataloader.
             #
