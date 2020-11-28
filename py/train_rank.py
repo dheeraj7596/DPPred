@@ -146,6 +146,17 @@ def arrange_label_to_rules(rules):
     return label_to_rules
 
 
+def normalize_entropy(label_to_rules):
+    for l in label_to_rules:
+        max_ent = -1
+        for r in label_to_rules[l]:
+            max_ent = max(max_ent, r["entropy"])
+
+        for i in range(len(label_to_rules[l])):
+            label_to_rules[l][i]["entropy"] = label_to_rules[l][i]["entropy"] / max_ent
+    return label_to_rules
+
+
 def get_pseudo_labels(df, label_to_rules, intersection_threshold=50):
     X = []
     y_true = []
@@ -276,10 +287,11 @@ if __name__ == "__main__":
             rules = process_rules(lines)
             rules = associate_rules_to_labels(rules, word_index, bow_train, pred_labels, label_to_index)
             label_to_rules = arrange_label_to_rules(rules)
+            label_to_rules = normalize_entropy(label_to_rules)
             if len(label_to_rules) != len(labels):
                 raise Exception("Rules missing for labels: ", set(labels) - set(label_to_rules.keys()))
-            pickle.dump(rules, open(data_path + "rules.pkl", "wb"))
-            rules, label_to_rules = filter_rules(label_to_rules, entropy_threshold=1.5)
+            pickle.dump(rules, open(data_path + "rules_" + str(iteration) + ".pkl", "wb"))
+            rules, label_to_rules = filter_rules(label_to_rules, entropy_threshold=0.5)
             # X, y, y_true = get_pseudo_labels_soft(df, rules, labels, label_to_index)
             X, y, y_true = get_pseudo_labels(df, label_to_rules, intersection_threshold=10)
 
